@@ -14,6 +14,12 @@ app.use((req, res, next) => {
 });
 
 app.use("/google", googleAuthRoutes);
+app.use((error, req, res, next) => {
+  const status = error.statusCode || 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
+});
 
 app.listen(PORT, () => {
   console.log("server is running on port ", PORT);
