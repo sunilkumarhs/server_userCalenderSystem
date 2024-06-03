@@ -17,8 +17,10 @@ const oauth2client = new google.auth.OAuth2(
   process.env.REDIRECT_URL
 );
 
-const scopes = ["https://www.googleapis.com/auth/calendar"];
-let tokensset;
+const scopes = [
+  "https://www.googleapis.com/auth/calendar",
+  " https://www.googleapis.com/auth/userinfo.profile",
+];
 
 exports.getGoogleAuthPage = (req, res, next) => {
   try {
@@ -40,7 +42,6 @@ exports.getGoogleCalenderPage = async (req, res, next) => {
   try {
     const { tokens } = await oauth2client.getToken(code);
     oauth2client.setCredentials(tokens);
-    tokensset = tokens;
     const token = tokens.access_token;
     const expries = tokens.expiry_date;
     const jwtToken = jwt.sign(
@@ -60,27 +61,21 @@ exports.getGoogleCalenderPage = async (req, res, next) => {
 
 exports.getUserInfo = async (req, res, next) => {
   try {
-    console.log(tokensset);
-    const data = await fetch("https://www.googleapis.com/userinfo/v2/me", {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${req.accessToken}`,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!data) {
+    const data = await fetch(
+      "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${req.accessToken}`,
+        },
+      }
+    );
+    if (data.status !== 200) {
       const error = new Error("Fetching of userInfo failed!!");
-      error.statusCode = 404;
+      error.statusCode = data.status;
       throw error;
     }
     const jsonData = await data.json();
-    console.log(jsonData);
-    if (!jsonData) {
-      const error = new Error("Fetching of userInfo failed!!");
-      error.statusCode = 404;
-      throw error;
-    }
     res.status(200).json({
       message: "UserInfo fetched successfully!",
       userInfo: jsonData,
