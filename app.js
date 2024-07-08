@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 dotenv.config();
+const mongoose = require("mongoose");
 const express = require("express");
 const googleAuthRoutes = require("./src/routes/googleAuth");
 
@@ -21,6 +22,11 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-app.listen(PORT, () => {
-  console.log("server is running on port ", PORT);
-});
+mongoose
+  .connect(process.env.NODE_APP_MONGODB_URI_KEY)
+  .then((result) => {
+    app.listen(PORT, () => {
+      console.log("server is running on port ", PORT);
+    });
+  })
+  .catch((err) => console.log(err));
