@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 const eventSchema = new Schema({
   userMailId: { type: Schema.Types.ObjectId, ref: "UserMail", required: true },
   title: { type: String, required: true },
-  startTime: { type: String, required: true },
-  endTime: { type: String, required: true },
-  guests: [{ email: { type: String }, isOptional: { type: Boolean } }],
+  startTime: { type: Object, required: true },
+  endTime: { type: Object, required: true },
+  guests: [{ type: Object }],
   meetingId: { type: String },
   description: { type: String },
 });

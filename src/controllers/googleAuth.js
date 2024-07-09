@@ -20,6 +20,7 @@ const oauth2client = new google.auth.OAuth2(
 const scopes = [
   "https://www.googleapis.com/auth/calendar",
   " https://www.googleapis.com/auth/userinfo.profile",
+  " https://www.googleapis.com/auth/userinfo.email",
 ];
 
 exports.getGoogleAuthPage = (req, res, next) => {
@@ -61,15 +62,12 @@ exports.getGoogleCalenderPage = async (req, res, next) => {
 
 exports.getUserInfo = async (req, res, next) => {
   try {
-    const data = await fetch(
-      "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${req.accessToken}`,
-        },
-      }
-    );
+    const data = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${req.accessToken}`,
+      },
+    });
     if (data.status !== 200) {
       const error = new Error("Fetching of userInfo failed!!");
       error.statusCode = data.status;
@@ -88,7 +86,7 @@ exports.getUserInfo = async (req, res, next) => {
   }
 };
 
-exports.getGoogleCalenderSceduleEvent = async (req, res, next) => {
+exports.getGoogleCalenderSceduleEventMeet = async (req, res, next) => {
   await calender.events.insert({
     auth: oauth2client,
     calendarId: "primary",
@@ -110,6 +108,46 @@ exports.getGoogleCalenderSceduleEvent = async (req, res, next) => {
         },
       },
       attendees: [{ email: "sunilkumarhs984586@gmail.com" }],
+    },
+  });
+  res.send({ msg: "done" });
+};
+
+exports.getGoogleCalenderSceduleEvent = async (req, res, next) => {
+  await calender.events.insert({
+    auth: oauth2client,
+    calendarId: "primary",
+    requestBody: {
+      summary: "This is test event!",
+      description: "some events are very important!",
+      start: {
+        dateTime: dayjs(new Date()).add(1, "day").toISOString(),
+        timeZone: "Asia/Kolkata",
+      },
+      end: {
+        dateTime: dayjs(new Date()).add(1, "day").add(1, "hour").toISOString(),
+        timeZone: "Asia/Kolkata",
+      },
+    },
+  });
+  res.send({ msg: "done" });
+};
+
+exports.getGoogleCalenderSceduleTask = async (req, res, next) => {
+  await calender.events.insert({
+    auth: oauth2client,
+    calendarId: "primary",
+    requestBody: {
+      summary: "This is test event!",
+      description: "some events are very important!",
+      start: {
+        dateTime: dayjs(new Date()).add(1, "day").toISOString(),
+        timeZone: "Asia/Kolkata",
+      },
+      end: {
+        dateTime: dayjs(new Date()).add(1, "day").add(1, "hour").toISOString(),
+        timeZone: "Asia/Kolkata",
+      },
     },
   });
   res.send({ msg: "done" });
